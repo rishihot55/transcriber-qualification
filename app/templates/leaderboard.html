@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Transcript Leaderboard</title>
+
+	<link rel="stylesheet" type="text/css" href="static/css/bootstrap.css">
+	<script type="text/javascript" src="static/js/jquery-3.2.0.js"></script>
+	<script type="text/javascript" src="static/js/bootstrap.js"></script>
+</head>
+<body>
+	<div class='container'>
+		<h1>Transcript Leaderboard</h1>
+		<table id='leaderboard-table' class='table table-striped'>
+			<thead>
+				<th>S. No.</th>
+				<th>Name</th>
+				<th>Age</th>
+			</thead>
+			<tbody></tbody>
+		</table>	
+	</div>
+	
+
+	<script type="text/javascript">
+		function fetchItems() {
+			return $.ajax({
+				method: "GET",
+				url: "/items"
+			});
+		}
+
+		function populateLeaderboard(items) {
+			let itemsHTML = items.reduce(function (acc, item, index) {
+				let row = "<tr><td>" + (index + 1)  + "</td><td>" + item.name + "</td><td>" + item.age + "</td></tr>";
+				return acc + row;
+			}, "");
+			$('#leaderboard-table > tbody').append(itemsHTML);
+		}
+
+		$(document).ready(function() {
+			fetchItems()
+			.then(populateLeaderboard);
+		});
+	</script>
+</body>
+</html>
