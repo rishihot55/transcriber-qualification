@@ -1,0 +1,22 @@
+{
+  "name": "transcriber-qualification",
+  "homepage": "https://github.com/rishihot55/transcriber-qualification",
+  "authors": [
+    "Rishi Rajasekaran <rajasekaran.rishi@gmail.com>"
+  ],
+  "description": "A leaderboard for evaluating speech and text models",
+  "main": "",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7",
+    "jquery": "^3.2.1"
+  }
+}
