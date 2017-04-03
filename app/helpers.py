@@ -6,8 +6,16 @@ data_file = 'db.pkl'
 
 seed_data = {
 	'items': OrderedDict([
-		(1, {'name': 'Rishi', 'age': 200 }), 
-		(2, {'name': 'Raj', 'age': 21 })
+		(1, {
+				'name': 'Pronounciation Exemplar',
+				'url': 'http://talknicer.com/recdemo/',
+				'valid': True
+		}), 
+		(2, {
+				'name': 'Transcriber Exemplar',
+				'url': 'https://rrajasek95.pythonanywhere.com',
+				'valid': False
+		})
 	])
 }
 
@@ -20,9 +28,36 @@ else:
 		data = seed_data
 		pickle.dump(data, f)
 
+def order(items, key, order_direction):
+	reverse_dir = order_direction == 'desc'
+	return sorted(items, key=lambda item: item[key], reverse=reverse_dir)
+
 def tag(item, id):
 		item['id'] = id
 		return item
+
+def top_n(items, limit='30'):
+
+	items = items if len(items) < limit else items[:limit]
+	return items
+
+# identity function, used for performing a default cast
+def id(x):
+	return x
+
+def bool(x):
+	return x in ['true']
+
+def cast(table, key, value):
+	func_dict = {
+		'items': {
+			'name': id,
+			'url': id,
+			'valid': bool
+		}
+	}
+
+	return func_dict[table][key](value)
 
 class Database():
 	def __init__(self, data):
