@@ -14,7 +14,8 @@
 			<thead>
 				<th>S. No.</th>
 				<th>Name</th>
-				<th>Age</th>
+				<th>URL</th>
+				<th>Valid</th>
 			</thead>
 			<tbody></tbody>
 		</table>	
@@ -31,7 +32,12 @@
 
 		function populateLeaderboard(items) {
 			let itemsHTML = items.reduce(function (acc, item, index) {
-				let row = "<tr><td>" + (index + 1)  + "</td><td>" + item.name + "</td><td>" + item.age + "</td></tr>";
+				let row = "<tr>"+
+					"<td>" + (index + 1)  + "</td>"+
+					"<td>" + item.name + "</td>"+
+					"<td><a href='"+ item.url +"'>" + item.url + "</a></td>"+
+					"<td>" + item.valid + "</td>"+
+					"</tr>";
 				return acc + row;
 			}, "");
 			$('#leaderboard-table > tbody').append(itemsHTML);
