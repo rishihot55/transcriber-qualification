@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Transay {% block title %}{% endblock %}</title>
+	<meta charset="utf-8">
+	<meta name="description" content="Audio Transcription Recording">
+	<meta name="author" content="CMU Sphinx">
+
+	<link rel="stylesheet" type="text/css" href="static/css/bootstrap.css">
+</head>
+<body>
+	<header>
+		{% block header %}
+			{% include 'components/navbar.html' %}
+		{% endblock %}
+	</header>
+	<content>
+		<div class="container">
+		{% block content %}
+		{% endblock %}
+		</div>
+	</content>
+	<footer>
+		{% block footer %}
+		{% endblock %}
+	</footer>
+
+	<script type="text/javascript" src="static/js/jquery.js"></script>
+	<script type="text/javascript" src="static/js/bootstrap.js"></script>
+
+</body>
+</html>

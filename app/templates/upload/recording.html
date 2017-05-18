@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+	<h1 class="text-center">Upload Recording</h1>
+	<div class="col-md-6 col-md-offset-3">
+		<form action="/recording" method="POST">
+			<input type="hidden" name="prompt_id">
+			<input type="hidden" name="prompt_signature">
+			<div class="form-group">
+				<label for="prompt">Please upload an audio file for the following prompt</label>
+				<p class="lead">Placeholder Prompt</p>
+			</div>
+			<div class="form-group">
+				<label>File</label>
+				<input type="file" name="recording" id="recording">
+			</div>
+			<button type="submit" class="btn btn-primary btn-block">Upload</button>
+		</form>
+	</div>
+</div>
+{% endblock %}

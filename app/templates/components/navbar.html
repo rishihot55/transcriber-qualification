@@ -1,0 +1,50 @@
+<nav class="navbar navbar-inverse">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<a class="navbar-brand" href="#">Transay</a>
+		</div>
+		<div>
+			<ul class="nav navbar-nav">
+				<li>
+					<a href="/">Home</a>
+				</li>
+				{% if session['user'] %}
+				<li>
+					<a href="/dashboard">Dashboard</a>
+				</li>
+				{% if session['user']['rights'][0] == '1' %}
+				<li>
+					<a href="/prompt">Add Prompt</a>
+				</li>
+				{% endif %}
+				{% if session['user']['rights'][1] == '1' %}
+				<li>
+					<a href="/transcript">Add Transcription</a>
+				</li>
+				{% endif %}
+				{% if session['user']['rights'][2] == '1' %}
+				<li>
+					<a href="/recording">Upload Recording</a>
+				</li>
+				{% endif %}
+				{% endif %}
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				{% block nav_right_links %}
+				{% if session['user'] %}
+				<li>
+					<a href="#">Hello, {{ session['user']['name']}}!</a>
+				</li>
+				<li>
+					<a href="/logout">Logout</a>
+				</li>
+				{% else %}
+				<li>
+					<a href="/login">Login</a>
+				</li>
+				{% endif %}
+				{% endblock %}
+			</ul>
+		</div>
+	</div>
+</nav>

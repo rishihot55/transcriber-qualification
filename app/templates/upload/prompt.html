@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class='row'>
+	<h1 class='text-center'>Add Prompt</h1>
+	<div class="col-md-6 col-md-offset-3">
+		<h2>Instructions</h2>
+		<ul>
+			<li>Enter words separated by single spaces.</li> 
+			<li>Denote alternate spellings by using a forward slash <code>/</code> without spaces.</li> 
+			<li>All punctuation will be ignored as spaces except for apostrophes <code>'</code></li>
+		</ul>
+		<form action='/prompt' method='POST'>
+			<div class='form-group'>
+				<label for='prompt'>
+				Enter Prompt
+				</label>
+				<input type="text" name="prompt" class='form-control' placeholder="Prompt">
+			</div>
+			<button type='submit' class='btn btn-primary btn-block'>Add Prompt</button>
+		</form>
+	</div>
+</div>
+{% endblock %}
