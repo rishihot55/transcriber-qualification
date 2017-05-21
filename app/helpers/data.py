@@ -27,6 +27,10 @@ class UserStore():
                 self.user_id_index[user_id] = user
                 self.user_number_index[user_number] = user
 
+    def all(self):
+        """Retrieve all users."""
+        return list(self.user_id_index.values())
+
     def find_by_id(self, user_id):
         """Perform a lookup by user_id."""
         if user_id in self.user_id_index:
@@ -40,6 +44,27 @@ class UserStore():
             return self.user_number_index[user_number]
         else:
             return None
+
+    def add(self, user_id, rights, name, email):
+        user_numbers_list = list(self.user_number_index.keys())
+        last_user_number = user_numbers_list[-1].lstrip("0")
+        next_user_number = int(last_user_number) + 1
+        padded_user_number = "{:06d}".format(next_user_number)
+        shash = "generichash"
+        entry = "{}:{}:{}:{}:{}:{}\n".format(
+            user_id, padded_user_number, shash, rights, name, email)
+        users_file_path = os.path.join('app', 'db', 'users.txt')
+        with open(users_file_path, 'a') as users_file:
+            users_file.write(entry)
+        user = user_dict(
+            user_id, padded_user_number, shash, rights, name, email
+        )
+        self.user_id_index[user_id] = user
+        self.user_number_index[padded_user_number] = user
+        return user
+
+    def update(self, user_number, user_id, rights, name, email):
+        pass
 
 
 class TranscriptStore():

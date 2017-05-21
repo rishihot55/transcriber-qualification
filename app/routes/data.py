@@ -33,6 +33,12 @@ def render_upload_recording():
     return render_template('upload/recording.html')
 
 
+@api.route('/recording/<recording_id>', methods=['GET'])
+@transcriber
+def retrieve_recording():
+    pass
+
+
 @api.route('/recording', methods=['POST'])
 @voicer
 def upload_file():

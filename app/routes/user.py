@@ -6,11 +6,16 @@ from app.helpers.forms import RegistrationForm
 from app.helpers.format import user_dict
 from app.routes import api
 
-from flask import abort, jsonify, request
+from flask import abort, jsonify, render_template, request
 
 
 def parse_rights(admin, transcriber, voicer):
     return ''.join(['1' if p else '0' for p in [admin, transcriber, voicer]])
+
+
+@api.route('/users/add', methods=['GET'])
+def render_create_user():
+    return render_template('users/create.html')
 
 
 @api.route('/users', methods=['POST'])
@@ -20,12 +25,12 @@ def create_user():
     form = RegistrationForm(request.form)
     if not form.validate():
         abort(400)
-    user = users.find_by_id(form.user_id)
+    user = users.find_by_id(form.user_id.data)
     if user:
         abort(403)
 
     rights = parse_rights(form.admin, form.transcriber, form.voicer)
-    user = users.add(form.user_id, rights, form.name, form.email)
+    user = users.add(form.user_id.data, rights, form.name.data, form.email.data)
     return jsonify(user)
 
 
@@ -53,9 +58,15 @@ def update_user(user_number):
     return jsonify(user)
 
 
+@api.route('/users', methods=['GET'])
+def get_all_users():
+    user_list = users.all()
+    return jsonify(user_list)
+
+
 @api.route('/users/<user_id>', methods=['GET'])
 def get_user_by_id(user_id):
     user = users.find_by_id(user_id)
     if not user:
         abort(404)
-    return jsonify(user_dict(*user))
+    return jsonify(user)
