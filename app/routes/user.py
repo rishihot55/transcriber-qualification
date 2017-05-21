@@ -3,7 +3,6 @@
 from app.helpers.data import users
 from app.helpers.decorators import admin
 from app.helpers.forms import RegistrationForm
-from app.helpers.format import user_dict
 from app.routes import api
 
 from flask import abort, jsonify, render_template, request
@@ -52,9 +51,10 @@ def update_user(user_number):
     user = users.find_by_number(user_number)
     if user:
         user = users.update(
-            user_number, form.user_id, rights, form.name, form.email)
+            user_number, form.user_id.data, rights, form.name.data, form.email.data)
     else:
-        user = users.add(form.user_id, rights, form.name, form.email)
+        user = users.add(
+            form.user_id.data, rights, form.name.data, form.email.data)
     return jsonify(user)
 
 
