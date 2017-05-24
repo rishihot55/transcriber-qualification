@@ -27,8 +27,8 @@ def create_user():
     user = users.find_by_id(form.user_id.data)
     if user:
         abort(403)
-
-    rights = parse_rights(form.admin, form.transcriber, form.voicer)
+    rights = parse_rights(
+        form.admin.data, form.transcriber.data, form.voicer.data)
     user = users.add(form.user_id.data, rights, form.name.data, form.email.data)
     return jsonify(user)
 

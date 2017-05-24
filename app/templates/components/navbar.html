@@ -14,17 +14,17 @@
 				</li>
 				{% if session['user']['rights'][0] == '1' %}
 				<li>
-					<a href="/prompt">Add Prompt</a>
+					<a href="/prompts/add">Add Prompt</a>
 				</li>
 				{% endif %}
 				{% if session['user']['rights'][1] == '1' %}
 				<li>
-					<a href="/transcript">Add Transcription</a>
+					<a href="/transcripts">Add Transcription</a>
 				</li>
 				{% endif %}
 				{% if session['user']['rights'][2] == '1' %}
 				<li>
-					<a href="/recording">Upload Recording</a>
+					<a href="/recordings/upload">Upload Recording</a>
 				</li>
 				{% endif %}
 				{% endif %}
