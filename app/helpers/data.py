@@ -125,7 +125,6 @@ class PromptStore():
         prompts_path = os.path.join('app', 'db')
         self.prompt_ids = {file[1:-4] for file in os.listdir(prompts_path)
                            if is_prompt_file(file)}
-        print(self.prompt_ids)
 
     def find_by_id(self, prompt_id):
         if prompt_id not in self.prompt_ids:
@@ -160,6 +159,12 @@ class RecordingStore():
         recordings_path = os.path.join('app', 'db')
         self.recordings = {file[:-4] for file in os.listdir(recordings_path)
                            if is_recording(file)}
+
+    def add(self, user_number, prompt_id, recording_file):
+        recording_file_name = 'p{}s{}.mp3'.format(prompt_id, user_number)
+        recording_file.save(os.path.join('app', 'db', recording_file_name))
+
+        return recording_file_name
 
     def recordings_by_user(self, user_number):
         return {recording for recording in self.recordings

@@ -2,7 +2,7 @@
 from app.routes import api
 from app.helpers.decorators import admin, transcriber, voicer
 from app.helpers.data import prompts, recordings, transcripts
-from app.helpers.format import clean_transcript
+from app.helpers.format import clean_transcript, is_audio_file
 from app.helpers.forms import TranscriptForm
 
 from flask import abort, jsonify, render_template, request, session
@@ -74,4 +74,17 @@ def download_recording(recording_id):
 @api.route('/recordings', methods=['POST'])
 @voicer
 def upload_file():
-    pass
+    prompt_id = request.form.get('prompt_id')
+    if 'recording' not in request.files or not prompts.find_by_id(prompt_id):
+        abort(400)
+    file = request.files['recording']
+    print(prompt_id)
+    if not is_audio_file(file):
+        abort(400)
+    user = session['user']
+
+    if 'p' + prompt_id in recordings.recordings_by_user(user['user_number']):
+        abort(403)
+    recording = recordings.add(user['user_number'], prompt_id, file)
+
+    return jsonify({'recording': recording})

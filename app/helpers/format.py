@@ -1,4 +1,5 @@
 import re
+import magic
 
 
 def user_dict(user_id, user_number, shash, rights, name, email):
@@ -30,6 +31,11 @@ def is_recording(filename):
 def is_transcript_file(filename):
     transcript_pattern = re.compile('^p[0-9]{6}s[0-9]{6}n[0-9]{3}\.txt$')
     return bool(transcript_pattern.match(filename))
+
+
+def is_audio_file(file):
+    mime_type = file.content_type
+    return mime_type in ['audio/mp3', 'audio/wav']
 
 
 def transcript_of_recording(transcript_id, recording_id):
