@@ -1,5 +1,8 @@
 **/__pycache__
-env
 *.pkl
 app/static
 bower_components/
+app/db
+.cache
+.eggs
+*.egg-info

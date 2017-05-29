@@ -25,3 +25,24 @@ def is_prompt_file(filename):
 def is_recording(filename):
     recording_pattern = re.compile('^p[0-9]{6}s[0-9]{6}\.(mp3|wav)$')
     return bool(recording_pattern.match(filename))
+
+
+def is_transcript_file(filename):
+    transcript_pattern = re.compile('^p[0-9]{6}s[0-9]{6}n[0-9]{3}\.txt$')
+    return bool(transcript_pattern.match(filename))
+
+
+def transcript_of_recording(transcript_id, recording_id):
+    return recording_id in transcript_id
+
+
+def recorded_by_user(recording_id, user_number):
+    return 's' + user_number in recording_id
+
+
+def clean_transcript(transcript):
+    """Process punctuation and other symbols and normalize to lower case."""
+    punctuation_stripped_transcript = re.sub(r'[^\w\']', " ", transcript)
+    cleaned_transcript = re.sub(r'\s+', " ",
+                                punctuation_stripped_transcript).strip().lower()
+    return cleaned_transcript

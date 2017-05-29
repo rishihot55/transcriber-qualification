@@ -18,9 +18,11 @@ def authenticate():
         abort(401)
 
     session['user'] = user
-    return redirect(url_for('api.render_dashboard'))
+    return '', 200
+
 
 @api.route('/logout', methods=['GET'])
 def logout():
-    del session['user']
-    return redirect(url_for('api.render_home'))
+    if 'user' in session:
+        del session['user']
+    return '', 200

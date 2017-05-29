@@ -16,6 +16,8 @@
 	</header>
 	<content>
 		<div class="container">
+		<div class='alert alert-success' id='success-panel'></div>
+		<div class='alert alert-danger' id='error-panel'></div>
 		{% block content %}
 		{% endblock %}
 		</div>
@@ -27,6 +29,7 @@
 
 	<script type="text/javascript" src="/static/js/jquery.js"></script>
 	<script type="text/javascript" src="/static/js/bootstrap.js"></script>
+	<script type="text/javascript" src="/js/common.js"></script>
 	{% block scripts %}
 
 	{% endblock %}

@@ -15,10 +15,14 @@
 				<label for='prompt'>
 				Enter Prompt
 				</label>
-				<input type="text" name="prompt" class='form-control' placeholder="Prompt">
+				<input type="text" name="prompt" id='prompt' class='form-control' placeholder="Prompt">
 			</div>
 			<button type='submit' class='btn btn-primary btn-block'>Add Prompt</button>
 		</form>
 	</div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript" src="/js/prompt.js"></script>
 {% endblock %}
