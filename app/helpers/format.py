@@ -18,6 +18,10 @@ def get_next_number(padded_num):
     return next_num
 
 
+def parse_prompt_id(file):
+    return file[1:7]
+
+
 def is_prompt_file(filename):
     prompt_pattern = re.compile('^p[0-9]{6}\.txt$')
     return bool(prompt_pattern.match(filename))

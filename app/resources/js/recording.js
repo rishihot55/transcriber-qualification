@@ -47,6 +47,12 @@ RecordingManager = {
 	},
 
 	setPrompt: function(data) {
+		if (data.prompt_id === -1) {
+			StatusWidget.showError('There are no more prompts left to pronounce, try later');
+			s.form.hide();
+			return;
+		}
+
 		s.promptIdField.val(data.prompt_id);
 		s.promptField.text(data.text);
 	},

@@ -20,4 +20,5 @@ class TranscriptForm(Form):
     or some form of vulnerability inducing input
     """
     transcript = StringField('Transcript',
-                             [validators.Regexp(r'^[A-Za-z\'";?!,.:]+$')])
+                             [validators.DataRequired(),
+                              validators.Regexp(r'^[\w\'";?!,.: ]+$')])

@@ -1,7 +1,7 @@
 """Data Management Helpers."""
 import os
 from shutil import copy2
-from app.helpers.format import get_next_number, is_prompt_file, user_dict, is_recording, transcript_of_recording, is_transcript_file, recorded_by_user
+from app.helpers.format import get_next_number, is_prompt_file, parse_prompt_id, user_dict, is_recording, transcript_of_recording, is_transcript_file, recorded_by_user
 from random import choice
 
 from flask import send_file
@@ -20,6 +20,7 @@ class UserStore():
         """
         self.user_id_index = {}
         self.user_number_index = {}
+        self.user_email_index = {}
         users_file_path = os.path.join('app', 'db', 'users.txt')
         with open(users_file_path, 'r') as users_file:
             for line in users_file:
@@ -30,6 +31,7 @@ class UserStore():
                 )
                 self.user_id_index[user_id] = user
                 self.user_number_index[user_number] = user
+                self.user_email_index[email] = user
 
     def all(self):
         """Retrieve all users."""
@@ -37,17 +39,14 @@ class UserStore():
 
     def find_by_id(self, user_id):
         """Perform a lookup by user_id."""
-        if user_id in self.user_id_index:
-            return self.user_id_index[user_id]
-        else:
-            return None
+        return self.user_id_index.get(user_id, None)
 
     def find_by_number(self, user_number):
         """Perform a lookup by user_number."""
-        if user_number in self.user_number_index:
-            return self.user_number_index[user_number]
-        else:
-            return None
+        return self.user_number_index.get(user_number, None)
+
+    def find_by_email(self, email):
+        return self.user_email_index.get(email, None)
 
     def add(self, user_id, rights, name, email):
         user_numbers_list = list(self.user_number_index.keys())
@@ -91,13 +90,17 @@ class TranscriptStore():
         self.transcripts = {file[:-4] for file in os.listdir(transcripts_path)
                             if is_transcript_file(file)}
 
-    def add_transcription(self, user_number, recording_id, transcript):
-        latest_transcript_id = max(
-            [transcript_id for transcript_id in self.transcripts
-             if transcript_of_recording(transcript_id, recording_id)])
-        next_transcript_id = get_next_number(latest_transcript_id[-3:])
-        transcript_file_name = '{}n{:03d}.txt'.format(
-            recording_id, next_transcript_id)
+    def add(self, user_number, recording_id, transcript):
+        transcript_id_list = [transcript_id for transcript_id
+                              in self.transcripts
+                              if transcript_of_recording(transcript_id, recording_id)]
+        if len(transcript_id_list) > 0:
+            latest_transcript_id = max(transcript_id_list)
+            next_transcript_id = get_next_number(latest_transcript_id[-3:])
+        else:
+            next_transcript_id = 1
+        transcript_file_name = '{}n{:03d}.txt'.format(recording_id,
+                                                      next_transcript_id)
         transcript_file_path = os.path.join('app', 'db', transcript_file_name)
         with open(transcript_file_path, 'w') as f:
             f.write(transcript)
@@ -123,7 +126,7 @@ class PromptStore():
 
     def __init__(self):
         prompts_path = os.path.join('app', 'db')
-        self.prompt_ids = {file[1:-4] for file in os.listdir(prompts_path)
+        self.prompt_ids = {parse_prompt_id(file) for file in os.listdir(prompts_path)
                            if is_prompt_file(file)}
 
     def find_by_id(self, prompt_id):
@@ -144,12 +147,15 @@ class PromptStore():
             f.write(text)
 
     def retrieve_random_unvoiced_prompt(self, user_number):
-        voiced_prompts = recordings.recordings_by_user(user_number)
+        voiced_prompts = {parse_prompt_id(recording) for recording in recordings.recordings_by_user(user_number)}
+        print(voiced_prompts)
         unvoiced_prompts = list(self.prompt_ids - voiced_prompts)
-
-        random_prompt = choice(unvoiced_prompts)
-        return {"prompt_id": random_prompt,
-                "text": self.find_by_id(random_prompt)}
+        try:
+            random_prompt = choice(unvoiced_prompts)
+            return {"prompt_id": random_prompt,
+                    "text": self.find_by_id(random_prompt)}
+        except IndexError:
+            return {"prompt_id": -1, "text": ""}
 
 
 class RecordingStore():
@@ -166,6 +172,9 @@ class RecordingStore():
 
         return recording_file_name
 
+    def exists(self, recording_id):
+        return recording_id in self.recordings
+
     def recordings_by_user(self, user_number):
         return {recording for recording in self.recordings
                 if recorded_by_user(recording, user_number)}
@@ -173,8 +182,11 @@ class RecordingStore():
     def retrieve_random_untranscribed_recording(self, user_number):
         completed_recordings = transcripts.transcribed_by_user(user_number)
         untranscribed_recordings = list(self.recordings - completed_recordings)
-        random_recording = choice(untranscribed_recordings)
-        return random_recording
+        try:
+            random_recording = choice(untranscribed_recordings)
+            return random_recording
+        except IndexError:
+            return -1
 
     def download_recording(self, recording_id):
         recordings_file_path = os.path.join('db', "{}.mp3".format(recording_id))

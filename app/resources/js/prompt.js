@@ -30,7 +30,7 @@ PromptManager = {
 
 	validatePrompt: function(prompt) {
 		return Validator.validate([
-			[prompt, [Validator.rules.required, Validator.rules.regexp(/^[\w.,?"':]+$/)]]
+			[prompt, [Validator.rules.regexp(/^[\w.,?"';: ]+$/)]]
 		]);
 	},
 

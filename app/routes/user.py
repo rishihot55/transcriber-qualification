@@ -25,7 +25,8 @@ def create_user():
     if not form.validate():
         abort(400)
     user = users.find_by_id(form.user_id.data)
-    if user:
+    user_by_email = users.find_by_email(form.email.data)
+    if user or user_by_email:
         abort(403)
     rights = parse_rights(
         form.admin.data, form.transcriber.data, form.voicer.data)

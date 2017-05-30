@@ -40,15 +40,19 @@ def render_transcript_submit_form():
 def submit_transcription():
     user = session['user']
     form = TranscriptForm(request.form)
-
     if not form.validate():
         abort(400)
-    recording_id = form.recording_id.data
+    dir(form)
+    recording_id = request.form['recording_id']
     transcript = form.transcript.data
     processed_transcript = clean_transcript(transcript)
-
+    if not recordings.exists(recording_id):
+        abort(400)
     if recording_id in transcripts.transcribed_by_user(user['user_number']):
         abort(403)
+
+    user = session['user']
+    transcripts.add(user['user_number'], recording_id, processed_transcript)
     return jsonify({"transcript": transcript})
 
 
