@@ -1,32 +1,28 @@
-<div class="row">
-	<h1 class="text-center">Add User</h1>
-	<div class="col-md-6 col-md-offset-3">
-		<form action="/users" method="POST" id="create-user-form">
-			<div class="form-group">
-				<label for="user_id">User ID</label>
-				<input type="text" id="user_id" name="user_id" class="form-control" placeholder="MTurk ID">
-			</div>
-			<div class="form-group">
-				<label for="rights">Roles</label>
-				<div class="checkbox">
-					<label><input type="checkbox" name="admin">Admin</span></label>
-				</div>
-				<div class="checkbox">
-					<label><input type="checkbox" class="checkbox" name="transcriber">Transcriber</label>
-				</div>
-				<div class="checkbox">
-					<label><input type="checkbox" class="checkbox" name="voicer">Voicer</label>
-				</div>
-			</div>
-			<div class="form-group">
-				<label for="name">Full Name</label>
-				<input type="text" name="name" id="name" class="form-control" placeholder="Full Name">
-			</div>
-			<div class="form-group">
-				<label for="email">Email Address</label>
-				<input type="email" name="email" id="email" class="form-control" placeholder="Email Address">
-			</div>
-			<button type="submit" class="btn btn-success btn-block">Create User</button>
-		</form>
+<h1 class="text-center">Add User</h1>
+<form action="/users" method="POST" id="create-user-form">
+	<div class="form-group">
+		<label for="user_id">User ID</label>
+		<input type="text" id="user_id" name="user_id" class="form-control" placeholder="MTurk ID">
 	</div>
-</div>
+	<div class="form-group">
+		<label for="rights">Roles</label>
+		<div class="checkbox">
+			<label><input type="checkbox" name="admin">Admin</span></label>
+		</div>
+		<div class="checkbox">
+			<label><input type="checkbox" class="checkbox" name="transcriber">Transcriber</label>
+		</div>
+		<div class="checkbox">
+			<label><input type="checkbox" class="checkbox" name="voicer">Voicer</label>
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="name">Full Name</label>
+		<input type="text" name="name" id="name" class="form-control" placeholder="Full Name">
+	</div>
+	<div class="form-group">
+		<label for="email">Email Address</label>
+		<input type="email" name="email" id="email" class="form-control" placeholder="Email Address">
+	</div>
+	<button type="submit" class="btn btn-success btn-block">Create User</button>
+</form>

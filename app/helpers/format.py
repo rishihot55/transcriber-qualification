@@ -16,6 +16,7 @@ def user_dict(user_id, user_number, shash, rights, name, email):
 def serialize_user(user_id, user_number, shash, rights, name, email):
     return "{}:{}:{}:{}:{}:{}\n".format(user_id, user_number, shash, rights, name, email)
 
+
 def get_next_number(padded_num):
     next_num = int(padded_num.lstrip("0")) + 1
     return next_num
@@ -26,17 +27,17 @@ def parse_prompt_id(file):
 
 
 def is_prompt_file(filename):
-    prompt_pattern = re.compile('^p[0-9]{6}\.txt$')
+    prompt_pattern = re.compile('^p\d{6}\.txt$')
     return bool(prompt_pattern.match(filename))
 
 
 def is_recording(filename):
-    recording_pattern = re.compile('^p[0-9]{6}s[0-9]{6}\.(mp3|wav)$')
+    recording_pattern = re.compile('^p\d{6}s\d{6}\.(mp3|wav)$')
     return bool(recording_pattern.match(filename))
 
 
 def is_transcript_file(filename):
-    transcript_pattern = re.compile('^p[0-9]{6}s[0-9]{6}n[0-9]{3}\.txt$')
+    transcript_pattern = re.compile('^p\d{6}s\d{6}n\d{3}\.txt$')
     return bool(transcript_pattern.match(filename))
 
 

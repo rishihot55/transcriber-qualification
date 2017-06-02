@@ -1,4 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Dashboard</h1>
+<h1 class="text-center">Dashboard</h1>
+{% if session['user']['rights'][0] == "1" %}
+	{% include "dashboard/admin.html" %}
+{% elif session['user']['rights'][1] == "1" %}
+	{% include "dashboard/voicer.html" %}
+{% elif session['user']['rights'][1] == "1" %}
+	{% include "dashboard/transcribe.html" %}
+{% endif%}
+{% endblock %}
+
+{% block scripts %}
+{% if session['user']['rights'][0] == "1" %}
+{% elif session['user']['rights'][1] == "1" %}
+{% elif session['user']['rights'][1] == "1" %}
+{% endif%}
 {% endblock %}

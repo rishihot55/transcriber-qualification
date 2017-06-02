@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-	{% include "users/create.html" %}
-	{% include "users/update.html" %}
+	<div class="row">
+		<div class="col-md-6">{% include "users/create.html" %}</div>
+		<div class="col-md-6">{% include "users/update.html" %}</div>
+	</div>
 {% endblock %}
 
 {% block scripts %}
