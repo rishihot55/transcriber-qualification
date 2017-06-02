@@ -14,6 +14,9 @@
 				</li>
 				{% if session['user']['rights'][0] == '1' %}
 				<li>
+					<a href="/users/manage">Manage Users</a>
+				</li>
+				<li>
 					<a href="/prompts/add">Add Prompt</a>
 				</li>
 				{% endif %}

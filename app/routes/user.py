@@ -5,23 +5,23 @@ from app.helpers.decorators import admin
 from app.helpers.forms import RegistrationForm
 from app.routes import api
 
-from flask import abort, jsonify, render_template, request
+from flask import abort, jsonify, render_template, request, session
 
 
 def parse_rights(admin, transcriber, voicer):
     return ''.join(['1' if p else '0' for p in [admin, transcriber, voicer]])
 
 
-@api.route('/users/add', methods=['GET'])
-def render_create_user():
-    return render_template('users/create.html')
+@api.route('/users/manage', methods=['GET'])
+def render_manage_user():
+    return render_template('/users/management.html')
 
 
 @api.route('/users', methods=['POST'])
 @admin
 def create_user():
     """Create User."""
-    form = RegistrationForm(request.form)
+    form = RegistrationForm(request.form, admin=False, transcriber=False, voicer=False)
     if not form.validate():
         abort(400)
     user = users.find_by_id(form.user_id.data)
@@ -48,9 +48,12 @@ def update_user(user_number):
     form = RegistrationForm(request.form)
     if not form.validate():
             abort(400)
-    rights = parse_rights(form.admin, form.transcriber, form.voicer)
+    rights = parse_rights(form.admin.data, form.transcriber.data, form.voicer.data)
     user = users.find_by_number(user_number)
     if user:
+        if session['user']['user_id'] == user['user_id'] and user['rights'][0] == "1" and rights[0] == "0":
+            # Prevent self demotion
+            abort(403)
         user = users.update(
             user_number, form.user_id.data, rights, form.name.data, form.email.data)
     else:

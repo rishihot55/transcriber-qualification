@@ -1,7 +1,8 @@
 """Data Management Helpers."""
 import os
+import re
 from shutil import copy2
-from app.helpers.format import get_next_number, is_prompt_file, parse_prompt_id, user_dict, is_recording, transcript_of_recording, is_transcript_file, recorded_by_user
+from app.helpers.format import get_next_number, is_prompt_file, parse_prompt_id, user_dict, is_recording, serialize_user, transcript_of_recording, is_transcript_file, recorded_by_user
 from random import choice
 
 from flask import send_file
@@ -53,7 +54,7 @@ class UserStore():
         next_user_number = get_next_number(user_numbers_list[-1])
         padded_user_number = "{:06d}".format(next_user_number)
         shash = "generichash"
-        entry = "{}:{}:{}:{}:{}:{}\n".format(
+        entry = serialize_user(
             user_id, padded_user_number, shash, rights, name, email)
 
         users_file_path = os.path.join('app', 'db', 'users.txt')
@@ -71,7 +72,25 @@ class UserStore():
         return user
 
     def update(self, user_number, user_id, rights, name, email):
-        pass
+        users_content = None
+        users_file_path = os.path.join('app', 'db', 'users.txt')
+        with open(users_file_path, 'r') as f:
+            users_content = f.read()
+        temp_path = 'users.tmp'
+        shash = "generichash"
+        entry = serialize_user(user_id, user_number, shash, rights, name, email)
+        pattern = '\\b.*?:{}.*?\n'.format(user_number)
+        updated_contents = re.sub(pattern, entry, users_content)
+        with open(temp_path, 'w') as temp_file:
+            temp_file.write(updated_contents)
+        os.rename(temp_path, users_file_path)
+        user = user_dict(
+            user_id, user_number, shash, rights, name, email
+        )
+
+        self.user_id_index[user_id] = user
+        self.user_number_index[user_number] = user
+        return user
 
 
 class TranscriptStore():
@@ -110,6 +129,7 @@ class TranscriptStore():
         with open(transcript_history_file, 'a') as f:
             f.write("{} {} {}\n".format(prompt_id,
                                         student_id, next_transcript_id))
+        self.transcripts.add(transcript_file_name[:-4])
 
     def transcribed_by_user(self, user_number):
         transcribed_recordings = set()
@@ -145,6 +165,7 @@ class PromptStore():
         prompt_file_path = os.path.join('app', 'db', prompt_file_name)
         with open(prompt_file_path, 'w') as f:
             f.write(text)
+        self.prompt_ids.add(parse_prompt_id(prompt_file_name))
 
     def retrieve_random_unvoiced_prompt(self, user_number):
         voiced_prompts = {parse_prompt_id(recording) for recording in recordings.recordings_by_user(user_number)}
@@ -169,7 +190,7 @@ class RecordingStore():
     def add(self, user_number, prompt_id, recording_file):
         recording_file_name = 'p{}s{}.mp3'.format(prompt_id, user_number)
         recording_file.save(os.path.join('app', 'db', recording_file_name))
-
+        self.recordings.add(recording_file_name[:-4])
         return recording_file_name
 
     def exists(self, recording_id):

@@ -13,6 +13,9 @@ def user_dict(user_id, user_number, shash, rights, name, email):
     }
 
 
+def serialize_user(user_id, user_number, shash, rights, name, email):
+    return "{}:{}:{}:{}:{}:{}\n".format(user_id, user_number, shash, rights, name, email)
+
 def get_next_number(padded_num):
     next_num = int(padded_num.lstrip("0")) + 1
     return next_num
