@@ -14,6 +14,12 @@ def render_prompt_form():
     return render_template('upload/prompt.html')
 
 
+@api.route('/prompts/all', methods=['GET'])
+@admin
+def get_all_prompts():
+    return jsonify(prompts.all())
+
+
 @api.route('/prompts', methods=['GET'])
 @voicer
 def get_voicing_prompt():

@@ -4,9 +4,7 @@ import re
 from shutil import copy2
 from app.helpers.format import get_next_number, is_prompt_file, parse_prompt_id, user_dict, is_recording, serialize_user, transcript_of_recording, is_transcript_file, recorded_by_user
 from random import choice
-
 from flask import send_file
-
 
 class UserStore():
     """User Storage and Management."""
@@ -148,6 +146,15 @@ class PromptStore():
         prompts_path = os.path.join('app', 'db')
         self.prompt_ids = {parse_prompt_id(file) for file in os.listdir(prompts_path)
                            if is_prompt_file(file)}
+        self.prompts = {}
+        for prompt_id in self.prompt_ids:
+            prompt_file = "p{}.txt".format(prompt_id)
+            prompt_file_path = os.path.join('app', 'db', prompt_file)
+            with open(prompt_file_path, 'r') as f:
+                self.prompts[prompt_id] = f.read()
+
+    def all(self):
+        return self.prompts
 
     def find_by_id(self, prompt_id):
         if prompt_id not in self.prompt_ids:
@@ -159,13 +166,17 @@ class PromptStore():
             return f.read()
 
     def add(self, text):
-        latest_prompt_id = max(self.prompt_ids)
-        next_prompt_id = get_next_number(latest_prompt_id)
+        if len(self.prompt_ids):
+            latest_prompt_id = max(self.prompt_ids)
+            next_prompt_id = get_next_number(latest_prompt_id)
+        else:
+            next_prompt_id = 1
         prompt_file_name = 'p{:06d}.txt'.format(next_prompt_id)
         prompt_file_path = os.path.join('app', 'db', prompt_file_name)
         with open(prompt_file_path, 'w') as f:
             f.write(text)
         self.prompt_ids.add(parse_prompt_id(prompt_file_name))
+        self.prompts["{:06d}".format(next_prompt_id)] = text
 
     def retrieve_random_unvoiced_prompt(self, user_number):
         voiced_prompts = {parse_prompt_id(recording) for recording in recordings.recordings_by_user(user_number)}
