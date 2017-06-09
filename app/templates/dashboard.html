@@ -4,15 +4,18 @@
 {% if session['user']['rights'][0] == "1" %}
 	{% include "dashboard/admin.html" %}
 {% elif session['user']['rights'][1] == "1" %}
-	{% include "dashboard/voicer.html" %}
-{% elif session['user']['rights'][1] == "1" %}
 	{% include "dashboard/transcribe.html" %}
+{% elif session['user']['rights'][2] == "1" %}
+	{% include "dashboard/voicer.html" %}
 {% endif%}
 {% endblock %}
 
 {% block scripts %}
 {% if session['user']['rights'][0] == "1" %}
+<script type="text/javascript" src="/js/dashboard.admin.js"></script>
 {% elif session['user']['rights'][1] == "1" %}
-{% elif session['user']['rights'][1] == "1" %}
+<script type="text/javascript" src="/js/dashboard.transcriber.js"></script>
+{% elif session['user']['rights'][2] == "1" %}
+<script type="text/javascript" src="/js/dashboard.voicer.js"></script>
 {% endif%}
 {% endblock %}

@@ -98,3 +98,21 @@ def upload_file():
     recording = recordings.add(user['user_number'], prompt_id, file)
 
     return jsonify({'recording': recording})
+
+
+@api.route('/hit/manage', methods=['GET'])
+@admin
+def render_manage_hit():
+    return render_template('hit/manage.html')
+
+
+@api.route('/hit/prompt', method=['POST'])
+@admin
+def create_prompt_external_question():
+    pass
+
+
+@api.route('/hit/recording', method=['POST'])
+@admin
+def create_recording_external_question():
+    pass
