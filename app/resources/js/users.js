@@ -125,7 +125,34 @@ UserUpdateWidget = {
 	}
 };
 
+var UserListWidget = {
+	settings: {
+		usersTableBody: $("#users > tbody")
+	},
+
+	retrieveUsers: function() {
+		return $.ajax({
+			method: "GET",
+			url: "/users"
+		});
+	},
+
+	renderUsersList: function(users) {
+		populateTable(UserListWidget.settings.usersTableBody, users, ["user_id", "name", "email", "rights"])
+	},
+
+	init: function() {
+		UserListWidget.retrieveUsers()
+		.then(UserListWidget.renderUsersList);
+	},
+
+	bindUIActions: function() {
+		
+	}
+};
+
 (function() {
 	UserCreateWidget.init();
 	UserUpdateWidget.init();
+	UserListWidget.init();
 })();

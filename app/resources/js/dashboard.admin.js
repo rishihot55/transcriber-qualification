@@ -21,13 +21,17 @@ PromptTableWidget = {
 
 	renderPrompts: function(prompts) {
 		var idx = 1;
+		var data = []
 		for (promptId in prompts) {
-			var rowElement = document.createElement("TR");
-			var rowText = '<td>' + idx + '</td><td>' + promptId + '</td><td>' + prompts[promptId] + '</td>';
-			rowElement.innerHTML = rowText ;
-			PromptTableWidget.settings.promptsBody.append(rowElement);
-			promptId += 1;
+			data.push({
+				"id": promptId,
+				"text": prompts[promptId]
+			});
 		}
+
+		console.log(data);
+
+		populateTable(PromptTableWidget.settings.promptsBody, data, ["id", "text"]);
 	}
 };
 
@@ -42,7 +46,7 @@ TranscriptTableWidget = {
 	},
 
 	retrieveTranscripts: function() {
-
+		
 	},
 
 	renderTranscripts: function() {

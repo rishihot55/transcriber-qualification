@@ -106,13 +106,13 @@ def render_manage_hit():
     return render_template('hit/manage.html')
 
 
-@api.route('/hit/prompt', method=['POST'])
+@api.route('/hit/prompt', methods=['POST'])
 @admin
 def create_prompt_external_question():
     pass
 
 
-@api.route('/hit/recording', method=['POST'])
+@api.route('/hit/recording', methods=['POST'])
 @admin
 def create_recording_external_question():
     pass

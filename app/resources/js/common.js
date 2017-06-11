@@ -98,6 +98,22 @@ var Validator = {
 	}
 };
 
+function populateTable(tableBody, data, fields) {
+	var idx = 1;
+	var tableFragment = document.createDocumentFragment();
+	for (var idx = 0 ; idx < data.length ; idx++) {
+		var rowElement = document.createElement("TR");
+		var rowText = "<td>" + (idx + 1) + "</td>";
+		for (var j = 0 ; j < fields.length ; j++) {
+			rowText += "<td>" + data[idx][fields[j]] + "</td>";
+		}
+		rowElement.innerHTML = rowText;
+		tableFragment.appendChild(rowElement);
+	}
+
+	tableBody.append(tableFragment);
+}
+
 (function() {
 	StatusWidget.init();
 	$('#logout-link').click(logout);
