@@ -154,6 +154,8 @@ class TranscriptStore():
     def transcribed_by_user(self, user_number):
         transcribed_recordings = set()
         user_file_path = os.path.join(data_path, 'u{}.txt'.format(user_number))
+        if not os.path.isfile(user_file_path):
+            open(user_file_path, 'w').close()
         with open(user_file_path, 'r') as completed_transcripts_file:
             for line in completed_transcripts_file:
                 fields = tuple(line.strip().split(" "))
