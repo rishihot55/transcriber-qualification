@@ -28,6 +28,7 @@ UserCreateWidget = {
 			UserCreateWidget.createUser(s.form.serialize())
 			.then(function() {
 				StatusWidget.showSuccess('The user has been created!');
+				UserListWidget.refresh();
 			});
 		});
 	},
@@ -100,6 +101,7 @@ UserUpdateWidget = {
 			UserUpdateWidget.updateUser(t.userNumber, t.form.serialize())
 			.then(function() {
 				StatusWidget.showSuccess('The user has been updated!');
+				UserListWidget.refresh();
 			});
 		});
 	},
@@ -138,6 +140,14 @@ var UserListWidget = {
 	},
 
 	renderUsersList: function(users) {
+		users = users.map(function(user) {
+			console.log(user);
+			// Perform a transform to make rights more readable
+			rights = [];
+
+			user.rights = rights.join();
+			return user;
+		});
 		populateTable(UserListWidget.settings.usersTableBody, users, ["user_id", "name", "email", "rights"])
 	},
 
@@ -148,8 +158,29 @@ var UserListWidget = {
 
 	bindUIActions: function() {
 		
+	},
+
+	clearUsersList: function() {
+		this.settings.usersTableBody.html("");
+	},
+
+	refresh: function() {
+		UserListWidget.clearUsersList();
+		UserListWidget.retrieveUsers()
+		.then(UserListWidget.renderUsersList);
 	}
 };
+
+function parseRights(rights) {
+	if (user.rights[0] == "1")
+		rights.push("Admin")
+	if (user.rights[1] == "1")
+		rights.push("Transcriber");
+	if (user.rights[2] == "1")
+		rights.push("Voicer");
+	if (rights.length == 0)
+		rights.push("Disabled");
+}
 
 (function() {
 	UserCreateWidget.init();
