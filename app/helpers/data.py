@@ -52,10 +52,11 @@ class UserStore():
 
     def __next_id(self):
         user_numbers_list = list(self.user_number_index.keys())
-        next_user_number = get_next_number(user_numbers_list[-1])
+        latest_user_number = max(user_numbers_list)
+        next_user_number = get_next_number(latest_user_number)
         return next_user_number
 
-    def __save(self, entry):
+    def __save_entry(self, entry):
         users_file_path = os.path.join(data_path, 'users.txt')
         temp_path = 'users.tmp'
         copy2(users_file_path, temp_path)
@@ -69,7 +70,7 @@ class UserStore():
         shash = "generichash"
         entry = serialize_user(
             user_id, padded_user_number, shash, rights, name, email)
-        self.__save(entry)
+        self.__save_entry(entry)
         user = user_dict(
             user_id, padded_user_number, shash, rights, name, email
         )
@@ -77,23 +78,31 @@ class UserStore():
         self.user_number_index[padded_user_number] = user
         return user
 
+    def __update_contents(self, content, entry):
+        user_number = entry[1]
+        pattern = '\\b.*?:{}.*?\n'.format(user_number)
+        updated_contents = re.sub(pattern, entry, content)
+        return updated_contents
+
+    def __save_content(self, content):
+        users_file_path = os.path.join(data_path, 'users.txt')
+        temp_path = 'users.tmp'
+        with open(temp_path, 'w') as temp_file:
+            temp_file.write(content)
+        os.rename(temp_path, users_file_path)
+
     def update(self, user_number, user_id, rights, name, email):
         users_content = None
         users_file_path = os.path.join(data_path, 'users.txt')
         with open(users_file_path, 'r') as f:
             users_content = f.read()
-        temp_path = 'users.tmp'
         shash = "generichash"
         entry = serialize_user(user_id, user_number, shash, rights, name, email)
-        pattern = '\\b.*?:{}.*?\n'.format(user_number)
-        updated_contents = re.sub(pattern, entry, users_content)
-        with open(temp_path, 'w') as temp_file:
-            temp_file.write(updated_contents)
-        os.rename(temp_path, users_file_path)
+        updated_contents = self.__update_contents(users_content, entry)
+        self.__save_content(updated_contents)
         user = user_dict(
             user_id, user_number, shash, rights, name, email
         )
-
         self.user_id_index[user_id] = user
         self.user_number_index[user_number] = user
         return user
@@ -239,6 +248,9 @@ class RecordingStore():
         self.recordings.add(recording_file_name[:-4])
         return recording_file_name
 
+    def all(self):
+        return self.recordings
+
     def exists(self, recording_id):
         return recording_id in self.recordings
 
@@ -248,9 +260,13 @@ class RecordingStore():
 
     def retrieve_random_untranscribed_recording(self, user_number):
         completed_recordings = transcripts.transcribed_by_user(user_number)
-        untranscribed_recordings = list(self.recordings - completed_recordings)
-        if untranscribed_recordings:
-            random_recording = choice(untranscribed_recordings)
+        completed_prompts = {parse_prompt_id(recording) for recording in completed_recordings}
+        prompts_with_recordings = {parse_prompt_id(recording) for recording in self.recordings}
+        untranscribed_prompts = list(prompts_with_recordings - completed_prompts)
+        if untranscribed_prompts:
+            random_prompt = choice(untranscribed_prompts)
+            recordings_of_prompt = [recording for recording in self.recordings if parse_prompt_id(recording) == random_prompt]
+            random_recording = choice(recordings_of_prompt)
             return random_recording
         else:
             return -1

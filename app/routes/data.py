@@ -2,7 +2,7 @@
 from app.routes import api
 from app.helpers.decorators import admin, transcriber, voicer
 from app.helpers.data import prompts, recordings, transcripts, users
-from app.helpers.format import clean_transcript, is_audio_file
+from app.helpers.format import clean_transcript, is_audio_file, parse_recording_data
 from app.helpers.forms import TranscriptForm
 
 from flask import abort, jsonify, render_template, request, session
@@ -67,6 +67,11 @@ def submit_transcription():
 def render_upload_recording():
     return render_template('upload/recording.html')
 
+@api.route('/recordings/all', methods=['GET'])
+@admin
+def get_all_recordings():
+    recording_data = [parse_recording_data(recording) for recording in recordings.all()]
+    return jsonify(recording_data)
 
 @api.route('/recordings', methods=['GET'])
 @transcriber

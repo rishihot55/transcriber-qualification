@@ -49,6 +49,12 @@ def is_audio_file(file):
 def transcript_of_recording(transcript_id, recording_id):
     return recording_id in transcript_id
 
+def parse_recording_data(file):
+    return {
+        "prompt_id": file[1:7],
+        "user_id": file[8:14],
+        "file": file
+    }
 
 def recorded_by_user(recording_id, user_number):
     return 's' + user_number in recording_id

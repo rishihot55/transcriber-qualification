@@ -27,3 +27,9 @@ def voicer(f):
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
+
+def turker(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        pass
+    return decorated_function

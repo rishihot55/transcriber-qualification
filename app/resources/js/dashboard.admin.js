@@ -1,4 +1,4 @@
-PromptTableWidget = {
+var PromptTableWidget = {
 	settings: {
 		promptsBody: $('#prompts > tbody')
 	},
@@ -29,15 +29,13 @@ PromptTableWidget = {
 			});
 		}
 
-		console.log(data);
-
 		populateTable(PromptTableWidget.settings.promptsBody, data, ["id", "text"]);
 	}
 };
 
-TranscriptTableWidget = {
+var TranscriptTableWidget = {
 	settings: {
-		transcriptsBody: $('#transcripts > body')
+		transcriptsBody: $('#transcripts > tbody')
 	},
 
 	init: function() {
@@ -52,8 +50,29 @@ TranscriptTableWidget = {
 	renderTranscripts: function() {
 
 	}
+
+};
+
+var RecordingTableWidget = {
+    settings: {
+    	recordingsBody: $('#recordings > tbody')
+    },
+
+    init: function() {
+    	RecordingTableWidget.retrieveRecordings()
+    	.then(RecordingTableWidget.renderRecordings);
+    },
+
+    retrieveRecordings: function() {
+    	return $.get("/recordings/all");
+    },
+
+    renderRecordings: function(recordings) {
+    	populateTable(RecordingTableWidget.settings.recordingsBody, recordings, ["user_id", "prompt_id"]);
+    }
 };
 
 (function() {
 	PromptTableWidget.init();
+	RecordingTableWidget.init();
 })();
