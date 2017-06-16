@@ -2,7 +2,7 @@ from app.helpers.data import users
 from app.helpers.format import user_dict
 from app.routes import api
 
-from flask import abort, redirect, render_template, request, session, url_for
+from flask import abort, redirect, render_template, request, session
 
 
 @api.route('/login', methods=['GET'])
@@ -25,4 +25,7 @@ def authenticate():
 def logout():
     if 'user' in session:
         del session['user']
-    return '', 200
+    if request.is_xhr:
+        return '', 200
+    else:
+        return redirect('/')
