@@ -1,6 +1,7 @@
 from app.routes import api
 
-from flask import render_template, send_from_directory
+from flask import redirect, render_template, send_from_directory, session
+from app.helpers.decorators import user
 
 
 @api.route('/', methods=['GET'])
@@ -9,7 +10,11 @@ def render_home():
 
 
 @api.route('/dashboard', methods=['GET'])
+@user
 def render_dashboard():
+    if session['user']['rights'][1] == '1':
+        return redirect('/transcripts')
+
     return render_template('dashboard.html')
 
 

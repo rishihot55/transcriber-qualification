@@ -4,19 +4,12 @@ var PromptTableWidget = {
 	},
 
 	init: function() {
-		PromptTableWidget.retrievePrompts()
+		PromptService.all()
 		.then(PromptTableWidget.renderPrompts)
 	},
 
 	bindUIActions: function() {
 
-	},
-
-	retrievePrompts: function() {
-		return $.ajax({
-			method: "GET",
-			url: "/prompts/all",
-		});
 	},
 
 	renderPrompts: function(prompts) {
@@ -68,11 +61,56 @@ var RecordingTableWidget = {
     },
 
     renderRecordings: function(recordings) {
-    	populateTable(RecordingTableWidget.settings.recordingsBody, recordings, ["user_id", "prompt_id"]);
+    	var recordingsData = transformArrayObjectProperty(recordings, "file", RecordingTableWidget.bindFileToButton);
+    	populateTable(RecordingTableWidget.settings.recordingsBody, recordingsData, ["user_id", "prompt_id", "file"]);
+    },
+
+    bindFileToButton: function(file) {
+    	return "<button class='btn btn-small btn-primary listen' value='" + file + "''>Listen</button>";
     }
+};
+
+var RecordingManager = {
+	settings: {
+		listenButton: $('.listen'),
+		audioElement: $('#recording'),
+		sourceElement: $('#source'),
+		currentRecording: null
+	},
+
+	init: function() {
+		RecordingManager.bindUIActions();
+	},
+
+	bindUIActions: function() {
+		// Bind buttons to listen audio
+		RecordingManager.settings.listenButton.click(function(e) {
+			// Get the corresponding data and play
+			var audioFile = $(this).val();
+			// Bind the audio file
+			bindAudio(audioFile);
+			RecordingManager.settings.audioElement.play();
+		});
+	},
+
+	retrieveAudio: function(audioFile) {
+		return $.ajax({
+			method: "GET",
+			url: "/recordings/" + audioFile
+		});
+	},
+
+	bindAudio: function(audioFile) {
+		if (RecordingManager.currentRecording !== audioFile) {
+			RecordingManager.sourceElement.attr('src', '/recordings/' + data.recording_id);
+			RecordingManager.audioElement.load();
+			RecordingMnaager.currentRecording = audioFile;
+		}
+	}
 };
 
 (function() {
 	PromptTableWidget.init();
 	RecordingTableWidget.init();
+	RecordingManager.init();
 })();

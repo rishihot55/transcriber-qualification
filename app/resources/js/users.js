@@ -7,14 +7,6 @@ UserCreateWidget = {
 		emailField: $('#create-user-form #email')
 	},
 
-	createUser: function(data) {
-		return $.ajax({
-			url: "/users",
-			method: "POST",
-			data: data
-		});
-	},
-
 	bindUIActions: function() {
 		s.form.submit(function(e) {
 			e.preventDefault();
@@ -25,7 +17,7 @@ UserCreateWidget = {
 				return;
 			}
 
-			UserCreateWidget.createUser(s.form.serialize())
+			UserService.create(s.form.serialize())
 			.then(function() {
 				StatusWidget.showSuccess('The user has been created!');
 				UserListWidget.refresh();
@@ -58,26 +50,19 @@ UserUpdateWidget = {
 		adminField: $('#update-user-form #admin'),
 		transcriberField: $('#update-user-form #transcriber'),
 		voicerField: $('#update-user-form #voicer'),
-
 		userNumber: null
-	},
-
-	fetchUser: function(userId) {
-		if (!userId) {
-			StatusWidget.showError('Please enter a user id!');
-			return;
-		}
-
-		return $.ajax({
-			url: "/users/" + userId,
-			method: 'GET'
-		});
 	},
 
 	bindUIActions: function() {
 		t.fetchUserButton.click(function(e) {
 			e.preventDefault();
-			UserUpdateWidget.fetchUser(t.userIdField.val())
+
+			if (!t.userIdField.val()) {
+				StatusWidget.showError('Please enter a user id!');
+				return;
+			}
+
+			UserService.find(t.userIdField.val())
 			.then(function(data) {
 				t.userNumber = data.user_number;
 				t.userIdField.val(data.user_id);
@@ -98,19 +83,11 @@ UserUpdateWidget = {
 				return;
 			}
 
-			UserUpdateWidget.updateUser(t.userNumber, t.form.serialize())
+			UserService.update(t.userNumber, t.form.serialize())
 			.then(function() {
 				StatusWidget.showSuccess('The user has been updated!');
 				UserListWidget.refresh();
 			});
-		});
-	},
-
-	updateUser: function(userNumber, data) {
-		return $.ajax({
-			url: "/users/" + userNumber,
-			method: "PUT",
-			data: data
 		});
 	},
 
@@ -132,29 +109,14 @@ var UserListWidget = {
 		usersTableBody: $("#users > tbody")
 	},
 
-	retrieveUsers: function() {
-		return $.ajax({
-			method: "GET",
-			url: "/users"
-		});
-	},
-
 	renderUsersList: function(users) {
-		users = users.map(function(user) {
-			// Perform a transform to make rights more readable
-			user.rights = parseRights(user.rights);
-			return user;
-		});
-		populateTable(UserListWidget.settings.usersTableBody, users, ["user_id", "name", "email", "rights"])
+		var usersData = transformArrayObjectProperty(users, "rights", parseRights);
+		populateTable(UserListWidget.settings.usersTableBody, usersData, ["user_id", "name", "email", "rights"])
 	},
 
 	init: function() {
-		UserListWidget.retrieveUsers()
+		UserService.all()
 		.then(UserListWidget.renderUsersList);
-	},
-
-	bindUIActions: function() {
-		
 	},
 
 	clearUsersList: function() {
@@ -163,7 +125,7 @@ var UserListWidget = {
 
 	refresh: function() {
 		UserListWidget.clearUsersList();
-		UserListWidget.retrieveUsers()
+		UserService.all()
 		.then(UserListWidget.renderUsersList);
 	}
 };

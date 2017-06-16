@@ -19,7 +19,7 @@ PromptManager = {
 				return;
 			}
 
-			PromptManager.sendPrompt(s.promptField.val())
+			PromptService.create(s.promptField.val())
 			.then(function() {
 				StatusWidget.showSuccess('Prompt has been added successfully');
 				PromptManager.clearFields();
@@ -32,16 +32,6 @@ PromptManager = {
 		return Validator.validate([
 			[prompt, [Validator.rules.regexp(/^[\w.,?"';: ]+$/)]]
 		]);
-	},
-
-	sendPrompt: function(prompt) {
-		return $.ajax({
-			method: 'POST',
-			url: '/prompts',
-			data: {
-				'prompt': prompt
-			}
-		});
 	},
 
 	clearFields: function() {

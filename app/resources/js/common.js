@@ -98,6 +98,55 @@ var Validator = {
 	}
 };
 
+var UserService = {
+	all: function() {
+		return $.get("/users");
+	},
+
+	update: function(userNumber, data) {
+		return $.ajax({
+			url: "/users/" + userNumber,
+			method: "PUT",
+			data: data
+		});
+	},
+
+	find: function(userId) {
+		return $.ajax({
+			url: "/users/" + userId,
+			method: 'GET'
+		});
+	},
+
+	create: function(data) {
+		return $.ajax({
+			url: "/users",
+			method: "POST",
+			data: data
+		});
+	}
+};
+
+var PromptService = {
+	all: function() {
+		return $.get("/prompts/all");
+	},
+
+	create: function(prompt) {
+		return $.ajax({
+			method: 'POST',
+			url: '/prompts',
+			data: {
+				'prompt': prompt
+			}
+		});
+	}
+};
+
+var RecordingService = {
+
+};
+
 function populateTable(tableBody, data, fields) {
 	var idx = 1;
 	var tableFragment = document.createDocumentFragment();
@@ -112,6 +161,12 @@ function populateTable(tableBody, data, fields) {
 	}
 
 	tableBody.append(tableFragment);
+}
+
+function transformArrayObjectProperty(data, property, transformFn) {
+	var dataCopy = $.extend(true, [], data); // Perform a deep copy of the array objects
+	dataCopy.forEach(function(item, index) { item[property] = transformFn(item[property]); });
+	return dataCopy;
 }
 
 (function() {
