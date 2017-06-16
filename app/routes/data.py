@@ -34,6 +34,10 @@ def add_prompt():
     prompts.add(prompt)
     return jsonify({'prompt': prompt})
 
+@api.route('/transcripts/all', methods=['GET'])
+@admin
+def get_all_transcripts():
+    transcript_data = [parse_transcript_data(transcript) for transcript in transcripts.all()]
 
 @api.route('/transcripts', methods=['GET'])
 @transcriber

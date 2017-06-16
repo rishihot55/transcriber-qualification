@@ -9,10 +9,10 @@
 					<a href="/">Home</a>
 				</li>
 				{% if session['user'] %}
+				{% if session['user']['rights'][0] == '1' %}
 				<li>
 					<a href="/dashboard">Dashboard</a>
 				</li>
-				{% if session['user']['rights'][0] == '1' %}
 				<li>
 					<a href="/users/manage">Manage Users</a>
 				</li>

@@ -2,7 +2,9 @@
 import os
 import re
 from shutil import copy2
-from app.helpers.format import get_next_number, is_prompt_file, parse_prompt_id, user_dict, is_recording, serialize_user, transcript_of_recording, is_transcript_file, recorded_by_user
+from app.helpers.format import get_next_number, is_prompt_file, parse_prompt_id
+from app.helpers.format import user_dict, is_recording, serialize_user
+from app.helpers.format import transcript_of_recording, is_transcript_file, recorded_by_user
 from random import choice
 from flask import send_file
 

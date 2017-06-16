@@ -14,7 +14,8 @@ def render_home():
 def render_dashboard():
     if session['user']['rights'][1] == '1':
         return redirect('/transcripts')
-
+    if session['user']['rights'][2] == '1':
+        return redirect('/recordings/upload')
     return render_template('dashboard.html')
 
 

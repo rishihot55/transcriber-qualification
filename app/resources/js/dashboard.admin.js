@@ -1,3 +1,7 @@
+var scope = {
+	users: null
+};
+
 var PromptTableWidget = {
 	settings: {
 		promptsBody: $('#prompts > tbody')
@@ -5,7 +9,10 @@ var PromptTableWidget = {
 
 	init: function() {
 		PromptService.all()
-		.then(PromptTableWidget.renderPrompts)
+		.then(function(users) {
+			scope.users = users
+			PromptTableWidget.renderPrompts(users);
+		});
 	},
 
 	bindUIActions: function() {
@@ -13,7 +20,6 @@ var PromptTableWidget = {
 	},
 
 	renderPrompts: function(prompts) {
-		var idx = 1;
 		var data = []
 		for (promptId in prompts) {
 			data.push({
@@ -21,7 +27,6 @@ var PromptTableWidget = {
 				"text": prompts[promptId]
 			});
 		}
-
 		populateTable(PromptTableWidget.settings.promptsBody, data, ["id", "text"]);
 	}
 };
@@ -35,15 +40,6 @@ var TranscriptTableWidget = {
 		TranscriptTableWidget.retrieveTranscripts()
 		.then(TranscriptTableWidget.renderTranscripts);
 	},
-
-	retrieveTranscripts: function() {
-		
-	},
-
-	renderTranscripts: function() {
-
-	}
-
 };
 
 var RecordingTableWidget = {
@@ -62,6 +58,11 @@ var RecordingTableWidget = {
 
     renderRecordings: function(recordings) {
     	var recordingsData = transformArrayObjectProperty(recordings, "file", RecordingTableWidget.bindFileToButton);
+    	if (scope.users != null) {
+    		recordingsData = transformArrayObjectProperty(recordingsData, "prompt_id", function(promptId) {
+    			return scope.users[promptId];
+    		});
+    	}
     	populateTable(RecordingTableWidget.settings.recordingsBody, recordingsData, ["user_id", "prompt_id", "file"]);
     },
 
