@@ -27,7 +27,7 @@ var PromptTableWidget = {
 				"text": prompts[promptId]
 			});
 		}
-		populateTable(PromptTableWidget.settings.promptsBody, data, ["id", "text"]);
+		populateTable(PromptTableWidget.settings.promptsBody, data, ["text"]);
 	}
 };
 
