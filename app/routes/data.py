@@ -1,6 +1,6 @@
 """Data Upload Routes."""
 from app.routes import api
-from app.helpers.decorators import admin, transcriber, voicer
+from app.helpers.decorators import admin, transcriber, voicer, user
 from app.helpers.data import prompts, recordings, transcripts, users
 from app.helpers.format import clean_transcript, is_audio_file, parse_recording_data
 from app.helpers.forms import TranscriptForm
@@ -85,7 +85,7 @@ def get_random_recording():
 
 
 @api.route('/recordings/<recording_id>', methods=['GET'])
-@transcriber
+@user
 def download_recording(recording_id):
     return recordings.download_recording(recording_id)
 

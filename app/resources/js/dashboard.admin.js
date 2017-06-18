@@ -64,34 +64,37 @@ var RecordingTableWidget = {
     		});
     	}
     	populateTable(RecordingTableWidget.settings.recordingsBody, recordingsData, ["user_id", "prompt_id", "file"]);
+    	RecordingManager.bindUIActions();
+    	
+
     },
 
     bindFileToButton: function(file) {
-    	return "<button class='btn btn-small btn-primary listen' value='" + file + "''>Listen</button>";
+    	return "<button class='btn btn-small btn-primary listen' value='" + file + "'' type='button'>Listen</button>";
     }
 };
 
 var RecordingManager = {
 	settings: {
 		listenButton: $('.listen'),
-		audioElement: $('#recording'),
+		audioElement: $('#audio')[0],
 		sourceElement: $('#source'),
 		currentRecording: null
 	},
 
 	init: function() {
-		RecordingManager.bindUIActions();
+
 	},
 
 	bindUIActions: function() {
 		// Bind buttons to listen audio
-		RecordingManager.settings.listenButton.click(function(e) {
-			// Get the corresponding data and play
+		$(document).on('click', '.listen', function() {
+    		// Get the corresponding data and play
 			var audioFile = $(this).val();
 			// Bind the audio file
-			bindAudio(audioFile);
+			RecordingManager.bindAudio(audioFile);
 			RecordingManager.settings.audioElement.play();
-		});
+    	});
 	},
 
 	retrieveAudio: function(audioFile) {
@@ -102,10 +105,10 @@ var RecordingManager = {
 	},
 
 	bindAudio: function(audioFile) {
-		if (RecordingManager.currentRecording !== audioFile) {
-			RecordingManager.sourceElement.attr('src', '/recordings/' + data.recording_id);
-			RecordingManager.audioElement.load();
-			RecordingMnaager.currentRecording = audioFile;
+		if (RecordingManager.settings.currentRecording !== audioFile) {
+			RecordingManager.settings.sourceElement.attr('src', '/recordings/' + audioFile);
+			RecordingManager.settings.audioElement.load();
+			RecordingManager.settings.currentRecording = audioFile;
 		}
 	}
 };
