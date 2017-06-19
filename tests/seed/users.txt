@@ -1,0 +1,3 @@
+sample_voicer:000001:generichash:001:Sample Voicer:voicer@voicer.com
+sample_transcriber:000002:generichash:010:Sample Transcriber:transcriber@transcriber.com
+sample_admin:000003:generichash:100:Sample Admin:admin@admin.com
