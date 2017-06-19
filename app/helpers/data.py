@@ -309,6 +309,6 @@ class RecordingStore():
         return send_file(recordings_file_path)
 
 users = UserStore(data_path)
-transcripts = TranscriptStore()
+transcripts = TranscriptStore(data_path)
 prompts = PromptStore()
 recordings = RecordingStore()
