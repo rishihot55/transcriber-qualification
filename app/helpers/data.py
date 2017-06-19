@@ -4,7 +4,9 @@ import re
 from shutil import copy2
 from app.helpers.format import get_next_number, is_prompt_file, parse_prompt_id
 from app.helpers.format import user_dict, is_recording, serialize_user
-from app.helpers.format import transcript_of_recording, is_transcript_file, recorded_by_user
+from app.helpers.format import transcript_of_recording, is_transcript_file
+from app.helpers.format import recorded_by_user
+from app.helpers.exceptions import UniqueConstraintError, StoreError
 from random import choice
 from flask import send_file
 
@@ -14,7 +16,7 @@ data_path = os.path.join('app', 'db')
 class UserStore():
     """User Storage and Management."""
 
-    def __init__(self):
+    def __init__(self, data_path):
         """
         Load the data from the flat file.
 
@@ -25,8 +27,8 @@ class UserStore():
         self.user_id_index = {}
         self.user_number_index = {}
         self.user_email_index = {}
-        users_file_path = os.path.join(data_path, 'users.txt')
-        with open(users_file_path, 'r') as users_file:
+        self.users_file_path = os.path.join(data_path, 'users.txt')
+        with open(self.users_file_path, 'r') as users_file:
             for line in users_file:
                 values = line.strip().split(":")
                 (user_id, user_number, shash, rights, name, email) = values
@@ -50,34 +52,40 @@ class UserStore():
         return self.user_number_index.get(user_number, None)
 
     def find_by_email(self, email):
+        """Perform a lookup by email address."""
         return self.user_email_index.get(email, None)
 
-    def __next_id(self):
+    def __next_user_number(self):
         user_numbers_list = list(self.user_number_index.keys())
         latest_user_number = max(user_numbers_list)
         next_user_number = get_next_number(latest_user_number)
-        return next_user_number
+        padded_user_number = "{:06d}".format(next_user_number)
+        return padded_user_number
 
     def __save_entry(self, entry):
-        users_file_path = os.path.join(data_path, 'users.txt')
         temp_path = 'users.tmp'
-        copy2(users_file_path, temp_path)
+        copy2(self.users_file_path, temp_path)
         with open(temp_path, 'a') as temp_file:
             temp_file.write(entry)
-        os.rename(temp_path, users_file_path)
+        os.rename(temp_path, self.users_file_path)
 
     def add(self, user_id, rights, name, email):
-        next_user_number = self.__next_id()
-        padded_user_number = "{:06d}".format(next_user_number)
+        """Insert a new user into the store."""
+        if self.find_by_id(user_id) or self.find_by_email(email):
+            raise UniqueConstraintError
+        next_user_number = self.__next_user_number()
         shash = "generichash"
         entry = serialize_user(
-            user_id, padded_user_number, shash, rights, name, email)
-        self.__save_entry(entry)
+            user_id, next_user_number, shash, rights, name, email)
+        try:
+            self.__save_entry(entry)
+        except IOError:
+            raise StoreError
         user = user_dict(
-            user_id, padded_user_number, shash, rights, name, email
+            user_id, next_user_number, shash, rights, name, email
         )
         self.user_id_index[user_id] = user
-        self.user_number_index[padded_user_number] = user
+        self.user_number_index[next_user_number] = user
         return user
 
     def __update_contents(self, content, entry):
@@ -87,19 +95,19 @@ class UserStore():
         return updated_contents
 
     def __save_content(self, content):
-        users_file_path = os.path.join(data_path, 'users.txt')
         temp_path = 'users.tmp'
         with open(temp_path, 'w') as temp_file:
             temp_file.write(content)
-        os.rename(temp_path, users_file_path)
+        os.rename(temp_path, self.users_file_path)
 
     def update(self, user_number, user_id, rights, name, email):
+        """Update an existing user in the store."""
         users_content = None
-        users_file_path = os.path.join(data_path, 'users.txt')
-        with open(users_file_path, 'r') as f:
+        with open(self.users_file_path, 'r') as f:
             users_content = f.read()
         shash = "generichash"
-        entry = serialize_user(user_id, user_number, shash, rights, name, email)
+        entry = serialize_user(
+            user_id, user_number, shash, rights, name, email)
         updated_contents = self.__update_contents(users_content, entry)
         self.__save_content(updated_contents)
         user = user_dict(
@@ -115,21 +123,21 @@ class TranscriptStore():
     Transcript Storage and Management.
 
     TODO:
-    - Constructor
-    - Find transcripts by users
     - Find transcripts for prompt
 
     """
 
     def __init__(self):
+        """Load list of transcripts into an index."""
         transcripts_path = data_path
         self.transcripts = {file[:-4] for file in os.listdir(transcripts_path)
                             if is_transcript_file(file)}
 
     def __new_id(self, recording_id):
-        transcript_id_list = [transcript_id for transcript_id
-                              in self.transcripts
-                              if transcript_of_recording(transcript_id, recording_id)]
+        transcript_id_list = [
+            transcript_id for transcript_id in self.transcripts
+            if transcript_of_recording(transcript_id, recording_id)]
+
         if len(transcript_id_list) > 0:
             latest_transcript_id = max(transcript_id_list)
             next_transcript_id = get_next_number(latest_transcript_id[-3:])
@@ -179,7 +187,8 @@ class PromptStore():
 
     def __init__(self):
         prompts_path = data_path
-        self.prompt_ids = {parse_prompt_id(file) for file in os.listdir(prompts_path)
+        self.prompt_ids = {parse_prompt_id(file)
+                           for file in os.listdir(prompts_path)
                            if is_prompt_file(file)}
         self.prompts = {}
         for prompt_id in self.prompt_ids:
@@ -262,22 +271,28 @@ class RecordingStore():
 
     def retrieve_random_untranscribed_recording(self, user_number):
         completed_recordings = transcripts.transcribed_by_user(user_number)
-        completed_prompts = {parse_prompt_id(recording) for recording in completed_recordings}
-        prompts_with_recordings = {parse_prompt_id(recording) for recording in self.recordings}
-        untranscribed_prompts = list(prompts_with_recordings - completed_prompts)
+        completed_prompts = {parse_prompt_id(recording)
+                             for recording in completed_recordings}
+        prompts_with_recordings = {parse_prompt_id(recording)
+                                   for recording in self.recordings}
+        untranscribed_prompts = list(
+            prompts_with_recordings - completed_prompts)
         if untranscribed_prompts:
             random_prompt = choice(untranscribed_prompts)
-            recordings_of_prompt = [recording for recording in self.recordings if parse_prompt_id(recording) == random_prompt]
+            recordings_of_prompt = [
+                recording for recording in self.recordings
+                if parse_prompt_id(recording) == random_prompt]
             random_recording = choice(recordings_of_prompt)
             return random_recording
         else:
             return -1
 
     def download_recording(self, recording_id):
-        recordings_file_path = os.path.join('db', "{}.mp3".format(recording_id))
+        recordings_file_path = os.path.join(
+            'db', "{}.mp3".format(recording_id))
         return send_file(recordings_file_path)
 
-users = UserStore()
+users = UserStore(data_path)
 transcripts = TranscriptStore()
 prompts = PromptStore()
 recordings = RecordingStore()

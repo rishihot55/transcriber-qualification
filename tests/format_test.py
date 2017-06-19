@@ -54,7 +54,8 @@ class FormatTestCase(unittest.TestCase):
             "p000102s000301n001.txt"
         ]
 
-        filtered_files = list(filter(format.is_transcript_file, transcript_files))
+        filtered_files = list(
+            filter(format.is_transcript_file, transcript_files))
 
         assert transcript_files == filtered_files
 
