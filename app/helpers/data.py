@@ -8,7 +8,7 @@ from app.helpers.format import transcript_of_recording, is_transcript_file
 from app.helpers.format import recorded_by_user
 from app.helpers.exceptions import UniqueConstraintError, StoreError
 from random import choice
-from flask import send_file
+from flask import send_from_directory
 
 
 class UserStore():
@@ -306,6 +306,5 @@ class RecordingStore():
 
     def download_recording(self, recording_id):
         """Retrieve a recording from disk."""
-        recordings_file_path = os.path.join(
-            self.recordings_path, "{}.mp3".format(recording_id))
-        return send_file(recordings_file_path)
+        return send_from_directory(
+            os.path.join('..', self.recordings_path), "{}.mp3".format(recording_id))
