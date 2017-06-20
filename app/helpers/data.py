@@ -10,8 +10,6 @@ from app.helpers.exceptions import UniqueConstraintError, StoreError
 from random import choice
 from flask import send_file
 
-data_path = os.path.join('app', 'db')
-
 
 class UserStore():
     """User Storage and Management."""
@@ -79,7 +77,7 @@ class UserStore():
             user_id, next_user_number, shash, rights, name, email)
         try:
             self.__save_entry(entry)
-        except (IOError, FileNotFoundError) as e:
+        except (IOError, FileNotFoundError):
             raise StoreError
         user = user_dict(
             user_id, next_user_number, shash, rights, name, email
@@ -190,16 +188,16 @@ class TranscriptStore():
 class PromptStore():
     """Prompt Storage and Management."""
 
-    def __init__(self):
+    def __init__(self, data_path):
         """Load all prompts from disk and create an index in memory."""
-        prompts_path = data_path
+        self.prompts_path = data_path
         self.prompt_ids = {parse_prompt_id(file)
-                           for file in os.listdir(prompts_path)
+                           for file in os.listdir(self.prompts_path)
                            if is_prompt_file(file)}
         self.prompts = {}
         for prompt_id in self.prompt_ids:
             prompt_file = "p{}.txt".format(prompt_id)
-            prompt_file_path = os.path.join(data_path, prompt_file)
+            prompt_file_path = os.path.join(self.prompts_path, prompt_file)
             with open(prompt_file_path, 'r') as f:
                 self.prompts[prompt_id] = f.read()
 
@@ -221,7 +219,7 @@ class PromptStore():
 
     def __save(self, new_prompt_id, text):
         prompt_file_name = 'p{:06d}.txt'.format(new_prompt_id)
-        prompt_file_path = os.path.join(data_path, prompt_file_name)
+        prompt_file_path = os.path.join(self.prompts_path, prompt_file_name)
         with open(prompt_file_path, 'w') as f:
             f.write(text)
         return prompt_file_name
@@ -233,16 +231,18 @@ class PromptStore():
         self.prompt_ids.add(parse_prompt_id(prompt_file_name))
         self.prompts["{:06d}".format(next_prompt_id)] = text
 
-    def __voiced_prompts_by_user(self, user_number):
-        return {parse_prompt_id(recording)
-                for recording in recordings.recordings_by_user(user_number)}
+    def __voiced_prompts_by_user(self, recording_store, user_number):
+        return {
+            parse_prompt_id(recording) for recording
+            in recording_store.recordings_by_user(user_number)}
 
-    def retrieve_random_unvoiced_prompt(self, user_number):
+    def retrieve_random_unvoiced_prompt(self, recording_store, user_number):
         """
         Retrieve a random chosen prompt which hasn't been voiced by the user.
         """
-        voiced_prompts = self.__voiced_prompts_by_user(user_number)
-        unvoiced_prompts = list(self.prompt_ids - voiced_prompts)
+        voiced_prompts = self.__voiced_prompts_by_user(
+            recording_store, user_number)
+        unvoiced_prompts = sorted(list(self.prompt_ids - voiced_prompts))
         if unvoiced_prompts:
             random_prompt = choice(unvoiced_prompts)
             return {"prompt_id": random_prompt,
@@ -254,16 +254,18 @@ class PromptStore():
 class RecordingStore():
     """Recording Storage and Management."""
 
-    def __init__(self):
+    def __init__(self, data_path):
         """Load recordings to memory."""
-        recordings_path = data_path
-        self.recordings = {file[:-4] for file in os.listdir(recordings_path)
-                           if is_recording(file)}
+        self.recordings_path = data_path
+        self.recordings = {
+            file[:-4] for file in os.listdir(self.recordings_path)
+            if is_recording(file)}
 
     def add(self, user_number, prompt_id, recording_file):
         """Save a new recording to disk."""
         recording_file_name = 'p{}s{}.mp3'.format(prompt_id, user_number)
-        recording_file.save(os.path.join(data_path, recording_file_name))
+        recording_file.save(
+            os.path.join(self.recordings_path, recording_file_name))
         self.recordings.add(recording_file_name[:-4])
         return recording_file_name
 
@@ -305,10 +307,5 @@ class RecordingStore():
     def download_recording(self, recording_id):
         """Retrieve a recording from disk."""
         recordings_file_path = os.path.join(
-            'db', "{}.mp3".format(recording_id))
+            self.recordings_path, "{}.mp3".format(recording_id))
         return send_file(recordings_file_path)
-
-users = UserStore(data_path)
-transcripts = TranscriptStore(data_path)
-prompts = PromptStore()
-recordings = RecordingStore()

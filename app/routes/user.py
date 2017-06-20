@@ -1,6 +1,6 @@
 """User Routes."""
 
-from app.helpers.data import users
+from app.helpers.stores import users
 from app.helpers.decorators import admin
 from app.helpers.forms import RegistrationForm
 from app.routes import api

@@ -1,7 +1,7 @@
 """Data Upload Routes."""
 from app.routes import api
 from app.helpers.decorators import admin, transcriber, voicer, user
-from app.helpers.data import prompts, recordings, transcripts, users
+from app.helpers.stores import prompts, recordings, transcripts, users
 from app.helpers.format import clean_transcript, is_audio_file, parse_recording_data
 from app.helpers.forms import TranscriptForm
 
@@ -24,7 +24,9 @@ def get_all_prompts():
 @voicer
 def get_voicing_prompt():
     user = session['user']
-    return jsonify(prompts.retrieve_random_unvoiced_prompt(user['user_number']))
+    return jsonify(
+        prompts.retrieve_random_unvoiced_prompt(
+            recordings, user['user_number']))
 
 
 @api.route('/prompts', methods=['POST'])
@@ -34,10 +36,13 @@ def add_prompt():
     prompts.add(prompt)
     return jsonify({'prompt': prompt})
 
+
 @api.route('/transcripts/all', methods=['GET'])
 @admin
 def get_all_transcripts():
-    transcript_data = [parse_transcript_data(transcript) for transcript in transcripts.all()]
+    transcript_data = [
+        parse_transcript_data(transcript) for transcript in transcripts.all()]
+    return jsonify(transcript_data)
 
 @api.route('/transcripts', methods=['GET'])
 @transcriber
@@ -140,11 +145,12 @@ def render_external_question():
     if not worker_id or not assignment_id or not submit_url:
         abort(400)
     if worker_id == "ASSIGNMENT_ID_NOT_AVAILABLE":
-        return render_template("hit/preview_transcript.html")
+        return render_template("hit/preview/transcript.html")
 
     user = users.find_by_id(worker_id)
     if not user:
-        user = users.add(worker_id, '010', 'turker', 'assignment {}'.format(assignment_id))
+        user = users.add(
+            worker_id, '010', 'turker', 'assignment {}'.format(assignment_id))
     session['user'] = user
 
     return render_template('hit/transcript.html')

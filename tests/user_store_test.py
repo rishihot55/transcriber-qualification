@@ -1,35 +1,24 @@
 from app.helpers.data import UserStore
-from app.helpers.exceptions import UniqueConstraintError
+from app.helpers.exceptions import UniqueConstraintError, StoreError
+from tests.helpers import data_path, seed_users_db, rm
+
 
 import os
-import shutil
 import unittest
-
-data_path = os.path.join('tests', 'db')
-seed_path = os.path.join('tests', 'seed')
-
-
-def touch(file_path):
-    """Create an empty file, if it doesn't exist."""
-    open(file_path, 'a').close()
-
-
-def seed_users_db(dest):
-    """Load seed user data to test data store."""
-    seed_users_file = os.path.join(seed_path, 'users.txt')
-    shutil.copy2(seed_users_file, dest)
 
 
 class UserStoreTestCase(unittest.TestCase):
     """Test cases for the UserStore class."""
 
     def setUp(self):
+        """Setup using seed `users.txt`."""
         self.users_file = os.path.join(data_path, 'users.txt')
         seed_users_db(self.users_file)
         self.users = UserStore(data_path)
 
     def tearDown(self):
-        os.remove(self.users_file)
+        """Remove users file."""
+        rm(self.users_file)
 
     def test_find_valid_user_by_id(self):
         user_id = 'sample_admin'
@@ -82,3 +71,11 @@ class UserStoreTestCase(unittest.TestCase):
 
         with self.assertRaises(UniqueConstraintError):
             self.users.add(*duplicate_email_user_data)
+
+    def test_add_non_setup_userstore(self):
+        """Throw a StoreError if users file doesn't exist."""
+        os.remove(self.users_file)
+        user_data = (
+            "test_voicer", "001", "Test Voicer", "test@voicer.com")
+        with self.assertRaises(StoreError):
+            self.users.add(*user_data)
