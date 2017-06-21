@@ -1,5 +1,5 @@
 var scope = {
-	users: null
+	prompts: null
 };
 
 var PromptTableWidget = {
@@ -10,13 +10,9 @@ var PromptTableWidget = {
 	init: function() {
 		PromptService.all()
 		.then(function(users) {
-			scope.users = users
+			scope.prompts = prompts;
 			PromptTableWidget.renderPrompts(users);
 		});
-	},
-
-	bindUIActions: function() {
-
 	},
 
 	renderPrompts: function(prompts) {
@@ -58,9 +54,9 @@ var RecordingTableWidget = {
 
     renderRecordings: function(recordings) {
     	var recordingsData = transformArrayObjectProperty(recordings, "file", RecordingTableWidget.bindFileToButton);
-    	if (scope.users != null) {
+    	if (scope.prompts != null) {
     		recordingsData = transformArrayObjectProperty(recordingsData, "prompt_id", function(promptId) {
-    			return scope.users[promptId];
+    			return scope.prompts[promptId];
     		});
     	}
     	populateTable(RecordingTableWidget.settings.recordingsBody, recordingsData, ["user_id", "prompt_id", "file"]);

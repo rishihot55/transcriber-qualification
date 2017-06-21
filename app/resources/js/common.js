@@ -143,6 +143,12 @@ var PromptService = {
 	}
 };
 
+var HitPromptService = {
+	all: function() {
+		return $.get("/hit/prompts/all");
+	}
+};
+
 var RecordingService = {
 
 };

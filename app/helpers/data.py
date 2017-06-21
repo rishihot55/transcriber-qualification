@@ -282,12 +282,13 @@ class RecordingStore():
         return {recording for recording in self.recordings
                 if recorded_by_user(recording, user_number)}
 
-    def retrieve_random_untranscribed_recording(self, user_number):
+    def retrieve_random_untranscribed_recording(self, transcript_store, user_number):
         """
         Retrieve a random recording whose prompt hasn't
         been transcribed by the user.
         """
-        completed_recordings = transcripts.transcribed_by_user(user_number)
+        completed_recordings = transcript_store.transcribed_by_user(
+            user_number)
         completed_prompts = {parse_prompt_id(recording)
                              for recording in completed_recordings}
         prompts_with_recordings = {parse_prompt_id(recording)
@@ -307,4 +308,5 @@ class RecordingStore():
     def download_recording(self, recording_id):
         """Retrieve a recording from disk."""
         return send_from_directory(
-            os.path.join('..', self.recordings_path), "{}.mp3".format(recording_id))
+            os.path.join('..', self.recordings_path),
+            "{}.mp3".format(recording_id))
