@@ -12,12 +12,17 @@
 </div>
 <div class="row">
 	<h3 class="text-center">HIT recording list</h3>
-	<table class="table table-striped">
+	<h4>Currently Played Recording:</h4>
+	<audio id="audio" controls>
+		<source type="audio/mpeg" id="source">
+	</audio>
+	<table class="table table-striped" id="recordings">
 		<thead>
 			<th>S. No.</th>
 			<th>Student Id</th>
 			<th>Prompt</th>
 			<th>Listen</th>
 		</thead>
+		<tbody></tbody>
 	</table>
 </div>

@@ -9,9 +9,9 @@ var PromptTableWidget = {
 
 	init: function() {
 		PromptService.all()
-		.then(function(users) {
+		.then(function(prompts) {
 			scope.prompts = prompts;
-			PromptTableWidget.renderPrompts(users);
+			PromptTableWidget.renderPrompts(prompts);
 		});
 	},
 
@@ -44,7 +44,7 @@ var RecordingTableWidget = {
     },
 
     init: function() {
-    	RecordingTableWidget.retrieveRecordings()
+    	RecordingService.all()
     	.then(RecordingTableWidget.renderRecordings);
     },
 

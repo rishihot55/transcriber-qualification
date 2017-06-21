@@ -32,6 +32,11 @@ def get_all_hit_recordings():
     return jsonify(recording_data)
 
 
+@api.route('/hit/recordings/<recording_id>', methods=['GET'])
+def download_hit_recording(recording_id):
+    return hit_recordings.download_recording(recording_id)
+
+
 @api.route('/hit/recordings', methods=['POST'])
 @admin
 def create_recording_external_question():

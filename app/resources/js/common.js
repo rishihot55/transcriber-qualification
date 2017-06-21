@@ -143,14 +143,22 @@ var PromptService = {
 	}
 };
 
+var RecordingService = {
+	all: function() {
+		return $.get("/recordings/all");
+	}
+};
+
 var HitPromptService = {
 	all: function() {
 		return $.get("/hit/prompts/all");
 	}
 };
 
-var RecordingService = {
-
+var HitRecordingService = {
+	all: function() {
+		return $.get("/hit/recordings/all");
+	}
 };
 
 function populateTable(tableBody, data, fields) {
