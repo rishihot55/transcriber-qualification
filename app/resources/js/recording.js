@@ -13,7 +13,7 @@ RecordingManager = {
 		s.form.submit(function(e) {
 			e.preventDefault();
 			if (!RecordingManager.validateRecording(s.file)) {
-				StatusWidget.showError('Please upload a valid recoding');
+				StatusWidget.showError('Please upload a valid recording');
 				return;
 			}
 

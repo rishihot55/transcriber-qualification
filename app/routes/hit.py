@@ -13,6 +13,7 @@ def render_manage_hit():
 
 
 @api.route('/hit/prompts/all', methods=['GET'])
+@admin
 def get_all_hit_prompts():
     return jsonify(hit_prompts.all())
 
@@ -20,6 +21,12 @@ def get_all_hit_prompts():
 @api.route('/hit/prompts', methods=['POST'])
 @admin
 def create_prompt_external_question():
+    pass
+
+
+@api.route("/hit/prompts/convert", methods=['POST'])
+@admin
+def convert_existing_prompt_to_hit():
     pass
 
 
@@ -43,8 +50,14 @@ def create_recording_external_question():
     pass
 
 
-@api.route('/hit', methods=['GET'])
-def render_external_question():
+@api.route("/hit/recordings/convert", methods=['POST'])
+@admin
+def convert_existing_recording_to_hit():
+    pass
+
+
+@api.route('/hit/transcript', methods=['GET'])
+def render_transcription_hit():
     group = request.args.get('group')
 
     if not group:
@@ -66,3 +79,20 @@ def render_external_question():
     session['user'] = user
 
     return render_template('hit/transcript.html')
+
+
+@api.route('/hit/recording', methods=['GET'])
+def render_recording_hit():
+    group = request.args.get('group')
+
+    if not group:
+        abort(400)
+
+    worker_id = request.args.get('workerId')
+    assignment_id = request.args.get('assignmentId')
+    submit_url = request.args.get('turkSubmitTo')
+
+    if not worker_id or not assignment_id or not submit_url:
+        abort(400)
+    if worker_id == "ASSIGNMENT_ID_NOT_AVAILABLE":
+        return render_template("hit/preview/recording.html")

@@ -13,7 +13,6 @@ var TranscriptPreviewManager = {
 	},
 
 	init: function() {
-		console.log("Init called");
 		TranscriptPreviewManager.bindUIActions();
 		TranscriptPreviewManager.loadRecording();
 	},
