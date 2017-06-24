@@ -33,6 +33,10 @@ def get_voicing_prompt():
 @admin
 def add_prompt():
     prompt = request.form.get('prompt')
+    if not prompt:
+        abort(400)
+    if prompt in prompts.all().values():
+        abort(403)
     prompts.add(prompt)
     return jsonify({'prompt': prompt})
 

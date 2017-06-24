@@ -152,6 +152,10 @@ var RecordingService = {
 var HitPromptService = {
 	all: function() {
 		return $.get("/hit/prompts/all");
+	},
+
+	unconverted: function() {
+		return $.get("/hit/prompts/unconverted");
 	}
 };
 
